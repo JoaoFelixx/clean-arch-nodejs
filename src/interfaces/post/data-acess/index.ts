@@ -1,11 +1,6 @@
-interface PostDataBase {
-  insert<T>(type: T): void;
-}
+import { makeDb } from '../../../infrastructure/post/db';
+import { makePostsDb } from './posts-db';
 
-const postsDb: PostDataBase = {
-  insert(type) {
+const postsDb = makePostsDb({ makeDb });
 
-  },
-}
-
-export { postsDb }
+export { postsDb };

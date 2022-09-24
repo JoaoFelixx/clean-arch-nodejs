@@ -9,18 +9,18 @@ interface Post {
 }
 
 interface PostDataBase {
-  insert<T>(type: T): void;
+  insert: (post: Post) => Promise<Post>;
 }
 
 interface DB {
   postsDb: PostDataBase;
 }
 
-const makeAddPost = ({ postsDb }: DB) => (postInfo: Post) => {
+const makeAddPost = ({ postsDb }: DB) => async (postInfo: Post): Promise<Error | Post> => {
   const result = makePost(postInfo);
 
   if (result instanceof Error)
-    return false;
+    return new Error('Error creating Post');
 
   return postsDb.insert({
     id: result.getId(),

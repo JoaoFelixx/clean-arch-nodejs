@@ -1,7 +1,15 @@
 import { makeId } from '../../../infrastructure/Id';
 
+interface Post {
+  id: string;
+  tags: string;
+  title: string;
+  image: string;
+  description: string;
+}
+
 interface DataBaseMethods {
-  insertOne<T> (type: T): Promise<boolean>;
+  insertOne<T> (type: T): Promise<Post>;
 }
 
 interface DataBase {
