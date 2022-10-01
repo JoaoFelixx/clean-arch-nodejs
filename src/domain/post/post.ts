@@ -1,52 +1,45 @@
-interface Post {
-  id: string;
-  tags: string;
-  title: string;
-  image: string;
-  description: string;
-}
+import { randomUUID as uuid } from 'crypto';
 
 interface CreatePost {
-  Id: {
-    makeId: () => string;
-  }
   validator(type: Post): { error?: string }
 }
 
-interface PostMethods {
-  getId: () => string,
-  getTags: () => string,
-  getImage: () => string,
-  getTitle: () => string,
-  getDescription: () => string,
+export interface Post {
+  _id: string;
+  tags: string[];
+  title: string;
+  description: string;
 }
 
-const buildMakePost = ({ Id, validator }: CreatePost) => ({
-  id = Id.makeId(),
-  tags,
-  image,
-  title,
-  description,
-}: Post): PostMethods | Error => {
-  try {
-    const { error } = validator({
-      id, tags, image, title, description
-    })
+export class PostEntity implements Partial<Post> {
+  public _id: string;
 
-    if (error)
-      throw new Error(error);
-
-    return Object.freeze({
-      getId: () => id,
-      getTags: () => tags,
-      getImage: () => image,
-      getTitle: () => title,
-      getDescription: () => description,
-    });
-
-  } catch (error) {
-    return new Error(error + '');
+  constructor(
+    public tags: string[],
+    public title: string,
+    public description: string,
+  ) {
+    this._id = uuid();
   }
-};
+}
+
+const buildMakePost = ({ validator }: CreatePost) =>
+  ({ tags, title, description }: Omit<Post, '_id'>): Post | Error => {
+    try {
+      const postCreated = new PostEntity(
+        tags, title, description
+      );
+
+      const { error } = validator(postCreated);
+
+      if (error)
+        throw new Error(error);
+
+      return Object.freeze(postCreated);
+
+    } catch (error) {
+      return new Error(error + '');
+    }
+  };
 
 export { buildMakePost };

@@ -1,29 +1,13 @@
-interface Post {
-  id: string;
-  tags: string;
-  title: string;
-  image: string;
-  description: string;
-}
+import { Post } from "../../domain/entities";
+import { model } from "mongoose";
+import '../database/schemas/Post';
 
-interface DataBaseMethods {
-  insertOne: (post: Post) => Promise<Post>;
-}
+const Posts = model<Post>('posts');
 
-interface DataBase {
-  collection: (collection: string) => DataBaseMethods;
-}
+type Models = 'posts';
 
-const OptionsDataBase: DataBase = {
-  collection(collection) {
-    return {
-      async insertOne(post) {
-        return post
-      },
-    }
-  },
-}
-
-const makeDb = async () => await OptionsDataBase;
+const makeDb = (modelSelected: Models) => ({
+  'posts': Posts,
+}[modelSelected])
 
 export { makeDb }

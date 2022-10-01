@@ -1,11 +1,7 @@
-interface Post {
-  id: string;
-  tags: string;
-  title: string;
-  image: string;
-  description: string;
-}
+import { Post } from '../../domain/entities';
 
-export function validator(post: Post): { error?: string } {
-  return { error: 'Erro' }
+type ErrorValidator = { error?: string }
+
+export function validator(post: Post): ErrorValidator {
+  return {  }
 }

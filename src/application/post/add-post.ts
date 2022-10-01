@@ -1,15 +1,8 @@
+import { Post } from '../../domain/entities';
 import { makePost } from "../../domain/post";
 
-interface Post {
-  id: string;
-  tags: string;
-  title: string;
-  image: string;
-  description: string;
-}
-
 interface PostDataBase {
-  insert: (post: Post) => Promise<Post>;
+  insert: (post: Post) => Promise<Post | Error>;
 }
 
 interface DB {
@@ -22,13 +15,7 @@ const makeAddPost = ({ postsDb }: DB) => async (postInfo: Post): Promise<Error |
   if (result instanceof Error)
     return new Error('Error creating Post');
 
-  return postsDb.insert({
-    id: result.getId(),
-    tags: result.getTags(),
-    image: result.getImage(),
-    title: result.getTitle(),
-    description: result.getDescription(),
-  });
+  return await postsDb.insert(result);
 };
 
 export { makeAddPost };

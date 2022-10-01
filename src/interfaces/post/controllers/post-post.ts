@@ -1,24 +1,24 @@
 interface Post {
-  id: string;
-  tags: string;
+  _id: string;
+  tags: string[];
   title: string;
-  image: string;
   description: string;
-  modifiedOn?: string;
 }
 
 interface PostMethods {
   addPost: (post: Post) => Promise<Error | Post>
 }
 
+interface HttpResponse {
+  status: (status: number) => {
+    json(data: any)
+  }
+  json(data: any);
+  sendStatus(status: number);
+}
+
 interface HttpRequest {
-  body: Post & {
-    source: {
-      ip: string;
-      browser: string;
-      referrer: string;
-    }
-  },
+  body: unknown;
   ip: string;
   headers: {
     'user-agent'?: string;
@@ -26,44 +26,22 @@ interface HttpRequest {
   },
 }
 
+const makePostPost = ({ addPost }: PostMethods) =>
+  async (httpRequest: HttpRequest, httpResponse: HttpResponse) => {
+    try { 
+      const post = httpRequest.body as Post;
 
+      const result = await addPost(post);
 
-const makePostPost = ({ addPost }: PostMethods) => async (httpRequest: HttpRequest) => {
-  try {
-    const { source, ...commentInfo } = httpRequest.body;
+      if (result instanceof Error) {
+        throw new Error(result.message);
+      }
 
-    source.ip = httpRequest.ip;
-    source.browser = httpRequest.headers['user-agent'];
-    if (httpRequest.headers.referer) {
-      source.referrer = httpRequest.headers.referer;
+      return httpResponse.status(201).json(result);
+
+    } catch (error) {
+      return httpResponse.sendStatus(400);
     }
-    const posted = await addPost({
-      ...commentInfo,
-    });
-
-    if (posted instanceof Error)
-      throw new Error();
-
-    return {
-      headers: {
-        'Content-Type': 'application/json',
-        'Last-Modified': new Date(posted.modifiedOn).toUTCString(),
-      },
-      statusCode: 201,
-      body: { posted },
-    };
-
-  } catch (error) {
-    return {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      statusCode: 400,
-      body: {
-        error: error.message,
-      },
-    };
   }
-}
 
 export { makePostPost };
