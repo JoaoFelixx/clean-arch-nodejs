@@ -2,7 +2,10 @@
   "name": "clean-arch-node-js",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "Felix developer <felixxdeveloper@gmail.com>",
+  "author": {
+    "name": "João Félix",
+    "url": "https://felixdeveloper.netlify.app"
+  },
   "license": "MIT",
   "type": "commonjs",
   "scripts": {
