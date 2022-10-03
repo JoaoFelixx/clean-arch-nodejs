@@ -35,6 +35,21 @@ const makePostsDb = ({ makeDb }: BuildConnection) => {
     }
   }
 
+  async function edit({ _id, ...post }: Post): Promise<Post | Error> {
+    try {
+      const oldPost = await db.findOne({ _id })
+
+      const newPost = Object.assign(oldPost, post);
+
+      await newPost.save();
+
+      return newPost;
+
+    } catch (error) {
+      return new Error('Error editing post');
+    }
+  }
+
   async function remove({ _id }: Pick<Post, '_id'>): Promise<void | Error> {
     try {
       await db.deleteOne({ _id });
@@ -43,7 +58,7 @@ const makePostsDb = ({ makeDb }: BuildConnection) => {
     }
   }
 
-  return Object.freeze({ insert, remove, get });
+  return Object.freeze({ get, edit, insert, remove });
 };
 
 export { makePostsDb };
