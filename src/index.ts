@@ -1,3 +1,6 @@
 import { application } from "./infrastructure/webserver";
 
-application.listen(3000, () => console.log('OK'));
+const PORT = process.env.PORT || 3000;
+
+application.listen(PORT, () => 
+  console.log(`Server running at port ${PORT}`));
