@@ -1,4 +1,4 @@
-import { HttpRequest, HttpResponse, Post } from '../../../domain/entities';
+import { HttpRequest, HttpResponse, Post } from '../../../../domain/entities';
 
 interface CreatePostMethod {
   addPost: (post: Post) => Promise<Error | Post>
