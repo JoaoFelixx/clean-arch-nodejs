@@ -1,44 +1,44 @@
-import { randomUUID as uuid } from 'crypto';
-
-interface CreatePost {
-  validator(type: Post): { error?: string }
-}
-
-export interface Post {
+interface Post {
   _id: string;
   tags: string[];
   title: string;
   description: string;
 }
 
-export class PostEntity implements Partial<Post> {
-  public _id: string;
+interface CreatePost {
+  validator(type: Post): { error?: string }
+  makeId: () => string;
+}
+
+class PostEntity implements Partial<Post> {
+  public readonly _id: string;
 
   constructor(
     public tags: string[],
     public title: string,
+    makeId: CreatePost['makeId'],
     public description: string,
   ) {
-    this._id = uuid();
+    this._id = makeId();
   }
 }
 
-const buildMakePost = ({ validator }: CreatePost) =>
+const buildMakePost = ({ validator, makeId }: CreatePost) =>
   ({ tags, title, description }: Omit<Post, '_id'>): Post | Error => {
     try {
       const postCreated = new PostEntity(
-        tags, title, description
+        tags, title, makeId, description
       );
 
       const { error } = validator(postCreated);
 
       if (error)
-        throw new Error(error);
+        return new Error(error);
 
       return Object.freeze(postCreated);
 
     } catch (error) {
-      return new Error(error + '');
+      return new Error('Error building post');
     }
   };
 
