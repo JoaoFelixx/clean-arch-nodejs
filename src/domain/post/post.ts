@@ -5,7 +5,7 @@ interface Post {
   description: string;
 }
 
-interface CreatePost {
+interface BuildMethods {
   validator(type: Post): { error?: string }
   makeId: () => string;
 }
@@ -16,14 +16,14 @@ class PostEntity implements Partial<Post> {
   constructor(
     public tags: string[],
     public title: string,
-    makeId: CreatePost['makeId'],
+    makeId: BuildMethods['makeId'],
     public description: string,
   ) {
     this._id = makeId();
   }
 }
 
-const buildMakePost = ({ validator, makeId }: CreatePost) =>
+const buildMakePost = ({ validator, makeId }: BuildMethods) =>
   ({ tags, title, description }: Omit<Post, '_id'>): Post | Error => {
     try {
       const postCreated = new PostEntity(
@@ -42,4 +42,19 @@ const buildMakePost = ({ validator, makeId }: CreatePost) =>
     }
   };
 
-export { buildMakePost };
+const buildMakeEdit = ({ validator }: Pick<BuildMethods, 'validator'>) =>
+  (post: Post): Post | Error => {
+    try {
+      const { error } = validator(post);
+
+      if (error)
+        return new Error(error);
+
+      return Object.freeze(post);
+
+    } catch (error) {
+      return new Error('Error editing post');
+    }
+  }
+
+export { buildMakeEdit, buildMakePost };
