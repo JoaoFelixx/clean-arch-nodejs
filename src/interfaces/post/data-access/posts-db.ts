@@ -21,7 +21,7 @@ const makePostsDb = ({ makeDb }: BuildConnection) => {
 
   async function get({ _id }: Partial<Pick<Post, '_id'>>): Promise<Post[] | Post | Error> {
     try {
-      if (_id) {
+      if (!_id) {
         const posts = await db.find<Post>();
 
         return posts;
